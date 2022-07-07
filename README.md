@@ -1,2 +1,2 @@
 # mestrado-ipt-criptografia-aes
-Implementação do AES na placa Thunderboard da SiLabs
+Implementação do AES na placa Nucleo-F429 da STMicroeletronics
