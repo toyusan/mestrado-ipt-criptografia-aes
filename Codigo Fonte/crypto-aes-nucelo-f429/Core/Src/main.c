@@ -64,7 +64,7 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void encrypt(char * plainText, char * key, unsigned char * outputBuffer){
+void encrypt_ecb(char * plainText, char * key, unsigned char * outputBuffer){
 
 	mbedtls_aes_context aes;
 
@@ -72,9 +72,17 @@ void encrypt(char * plainText, char * key, unsigned char * outputBuffer){
 	mbedtls_aes_setkey_enc( &aes, (const unsigned char*) key, strlen(key) * 8 );
 	mbedtls_aes_crypt_ecb( &aes, MBEDTLS_AES_ENCRYPT, (const unsigned char*)plainText, outputBuffer);
 	mbedtls_aes_free( &aes );
+
+	printf("Original plain text: %s\r\n", plainText);
+
+	printf("Ciphered text: ");
+	for (int i = 0; i < 16; i++) {
+
+		printf("%c", (int)outputBuffer[i]);
+	}
 }
 
-void decrypt(unsigned char * chipherText, char * key, unsigned char * outputBuffer){
+void decrypt_ecb(unsigned char * chipherText, char * key, unsigned char * outputBuffer){
 
 	mbedtls_aes_context aes;
 
@@ -82,7 +90,15 @@ void decrypt(unsigned char * chipherText, char * key, unsigned char * outputBuff
 	mbedtls_aes_setkey_dec( &aes, (const unsigned char*) key, strlen(key) * 8 );
 	mbedtls_aes_crypt_ecb(&aes, MBEDTLS_AES_DECRYPT, (const unsigned char*)chipherText, outputBuffer);
 	mbedtls_aes_free( &aes );
+
+	printf("\r\nDeciphered text: ");
+	for (int i = 0; i < 16; i++) {
+		printf("%c",(char)outputBuffer[i]);
+	}
+	printf("\r\n");
 }
+
+
 
 
 /* USER CODE END 0 */
@@ -98,7 +114,9 @@ int main(void)
 	// Cleans the printf buffer
 	setbuf(stdout, NULL);
 
-	char * key = "abcdefghijklmnop";
+	char * key128 = "abcdefghijklmnop";
+	char * key192 = "abcdefghijklmnopqrstuvxw";
+	char * key256 = "abcdefghijklmnopqrstuvxwyz123456";
 
 	char *plainText = "Criptografia AES";
 	unsigned char cipherTextOutput[16];
@@ -140,23 +158,22 @@ int main(void)
 
 		/* USER CODE BEGIN 3 */
 
-		encrypt(plainText, key, cipherTextOutput);
-		decrypt(cipherTextOutput, key, decipheredTextOutput);
-
-		printf("Original plain text: %s\r\n", plainText);
-
-		printf("Ciphered text: ");
-		for (int i = 0; i < 16; i++) {
-
-			printf("%02X", (int)cipherTextOutput[i]);
-		}
-
-		printf("\r\nDeciphered text: ");
-		for (int i = 0; i < 16; i++) {
-			printf("%c",(char)decipheredTextOutput[i]);
-		}
+		printf("Using 128 bits: \r\n");
+		encrypt_ecb(plainText, key128, cipherTextOutput);
+		decrypt_ecb(cipherTextOutput, key128, decipheredTextOutput);
 		printf("\r\n");
-		HAL_Delay(2000);
+
+		printf("Using 192 bits: \r\n");
+		encrypt_ecb(plainText, key192, cipherTextOutput);
+		decrypt_ecb(cipherTextOutput, key192, decipheredTextOutput);
+		printf("\r\n");
+
+		printf("Using 256 bits: \r\n");
+		encrypt_ecb(plainText, key256, cipherTextOutput);
+		decrypt_ecb(cipherTextOutput, key256, decipheredTextOutput);
+		printf("\r\n");
+
+		HAL_Delay(5000);
 	}
 	/* USER CODE END 3 */
 }
