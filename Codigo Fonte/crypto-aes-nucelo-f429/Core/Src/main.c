@@ -30,6 +30,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "aes.h"
+#include "aes_app.h"
 
 /* USER CODE END Includes */
 
@@ -64,42 +65,6 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void encrypt_ecb(char * plainText, char * key, unsigned char * outputBuffer){
-
-	mbedtls_aes_context aes;
-
-	mbedtls_aes_init( &aes );
-	mbedtls_aes_setkey_enc( &aes, (const unsigned char*) key, strlen(key) * 8 );
-	mbedtls_aes_crypt_ecb( &aes, MBEDTLS_AES_ENCRYPT, (const unsigned char*)plainText, outputBuffer);
-	mbedtls_aes_free( &aes );
-
-	printf("Original plain text: %s\r\n", plainText);
-
-	printf("Ciphered text: ");
-	for (int i = 0; i < 16; i++) {
-
-		printf("%c", (int)outputBuffer[i]);
-	}
-}
-
-void decrypt_ecb(unsigned char * chipherText, char * key, unsigned char * outputBuffer){
-
-	mbedtls_aes_context aes;
-
-	mbedtls_aes_init( &aes );
-	mbedtls_aes_setkey_dec( &aes, (const unsigned char*) key, strlen(key) * 8 );
-	mbedtls_aes_crypt_ecb(&aes, MBEDTLS_AES_DECRYPT, (const unsigned char*)chipherText, outputBuffer);
-	mbedtls_aes_free( &aes );
-
-	printf("\r\nDeciphered text: ");
-	for (int i = 0; i < 16; i++) {
-		printf("%c",(char)outputBuffer[i]);
-	}
-	printf("\r\n");
-}
-
-
-
 
 /* USER CODE END 0 */
 
@@ -119,8 +84,8 @@ int main(void)
 	char * key256 = "abcdefghijklmnopqrstuvxwyz123456";
 
 	char *plainText = "Criptografia AES";
-	unsigned char cipherTextOutput[16];
-	unsigned char decipheredTextOutput[16];
+	unsigned char cipherTextOutput[256];
+	unsigned char decipheredTextOutput[256];
 
 	/* USER CODE END 1 */
 
@@ -159,10 +124,17 @@ int main(void)
 		/* USER CODE BEGIN 3 */
 
 		printf("Using 128 bits: \r\n");
+
+//		printf("AES_ECB: \r\n");
 		encrypt_ecb(plainText, key128, cipherTextOutput);
 		decrypt_ecb(cipherTextOutput, key128, decipheredTextOutput);
 		printf("\r\n");
-
+/*
+		printf("AES_CBC: \r\n");
+		encrypt_cbc(plainText, key128, cipherTextOutput);
+		decrypt_cbc(cipherTextOutput, key128, decipheredTextOutput);
+		printf("\r\n");
+*/
 		printf("Using 192 bits: \r\n");
 		encrypt_ecb(plainText, key192, cipherTextOutput);
 		decrypt_ecb(cipherTextOutput, key192, decipheredTextOutput);
